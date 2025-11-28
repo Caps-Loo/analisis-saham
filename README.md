@@ -1,55 +1,100 @@
 # 📈 IDX Stock Forecaster: Multivariate LSTM
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.0%2B-orange)
-![Status](https://img.shields.io/badge/Status-Active-green)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
-
 ## 📋 Deskripsi Project
 
-**IDX Stock Forecaster** adalah sistem prediksi harga saham berbasis *Deep Learning* yang dirancang khusus untuk menangani volatilitas pasar saham Indonesia (IDX/BEI).
+**IDX Stock Forecaster** adalah sistem prediksi harga saham berbasis Deep Learning yang dirancang khusus untuk memodelkan dinamika pasar saham Indonesia (IDX/BEI).  
+Proyek ini memanfaatkan pendekatan **Multivariate Time Series**, sehingga model mampu memahami lebih banyak konteks dibanding pendekatan univariate tradisional.
 
-Berbeda dengan model prediksi konvensional yang hanya melihat riwayat harga (*Univariate*), sistem ini menggunakan pendekatan **Multivariate Time Series**. Model ini tidak hanya "melihat" harga masa lalu, tetapi juga "merasakan" momentum dan tren pasar dengan mengintegrasikan indikator teknikal:
-* **RSI (Relative Strength Index):** Mendeteksi kondisi jenuh beli (*overbought*) atau jenuh jual (*oversold*).
-* **MACD (Moving Average Convergence Divergence):** Mendeteksi arah dan kekuatan tren.
+Tidak hanya mengamati pergerakan harga historis, model juga menggabungkan indikator teknikal penting yang dapat menghasilkan prediksi yang lebih stabil dan akurat:
+
+- **RSI (Relative Strength Index):** Mengukur momentum beli/jual.
+- **MACD (Moving Average Convergence Divergence):** Menangkap kekuatan dan arah tren.
+- **Signal Line MACD:** Memberikan gambaran momentum jangka pendek.
+
+Dengan kombinasi fitur ini, model memperoleh perspektif yang lebih kaya terhadap kondisi pasar dan mampu menghasilkan prediksi yang lebih realistis.
+
+---
 
 ## ✨ Fitur Utama
 
-🚀 **Arsitektur Deep Learning Canggih**
-Menggunakan **Stacked LSTM** (Long Short-Term Memory) dengan mekanisme **Dropout** untuk mencegah *overfitting* dan mampu menangkap pola jangka panjang yang kompleks pada data saham.
+### 🚀 Arsitektur LSTM Bertingkat
 
-🧠 **Smart Feature Engineering**
-Menggabungkan data harga historis (`Close`) dengan analisis sentimen teknikal (`RSI`, `MACD`, `Signal Line`) sebagai fitur input (4 Dimensi), membuat prediksi lebih responsif terhadap perubahan pasar.
+- Menggunakan Stacked LSTM Layers untuk menangkap pola jangka panjang yang sulit ditangani model biasa.
+- Ditambah Dropout Regularization untuk mengurangi risiko overfitting.
 
-⏱️ **Optimasi Training Otomatis**
-Menerapkan **Early Stopping** untuk memantau proses pelatihan. Sistem akan berhenti secara otomatis di titik optimal (saat *loss* terendah), menghasilkan efisiensi waktu dan akurasi tinggi (RMSE rendah).
+### 🧠 Feature Engineering Kaya Informasi
 
-🏭 **Automated End-to-End Pipeline**
-Sistem "Pabrik Model" yang mampu memproses, melatih, dan menyimpan model serta *scaler* untuk berbagai saham (contoh: BBRI, TLKM, ASII, ANTM, ICBP) secara otomatis dalam satu kali eksekusi.
+Data input mencakup 4 fitur utama:
+- Harga penutupan (Close)
+- RSI
+- MACD
+- MACD Signal
 
-📅 **Smart Inference**
-Skrip prediksi universal yang cerdas dalam menangani kalender. Jika prediksi jatuh pada hari libur bursa (Sabtu/Minggu), sistem otomatis menggeser target prediksi ke hari kerja berikutnya (Senin).
+Pendekatan ini membuat model lebih sensitif terhadap perubahan struktur tren pasar.
 
-## 🛠️ Teknologi yang Digunakan
+### ⏱ Optimasi Training Otomatis
 
-* **Python**: Bahasa pemrograman utama.
-* **TensorFlow / Keras**: Membangun dan melatih model LSTM.
-* **YFinance**: Mengambil data saham *real-time* dari Yahoo Finance.
-* **Pandas & NumPy**: Manipulasi data dan perhitungan indikator teknikal.
-* **Scikit-Learn**: Normalisasi data (`MinMaxScaler`).
-* **Matplotlib**: Visualisasi grafik perbandingan harga asli vs prediksi.
+Menerapkan:
+- **Early Stopping:** Menghentikan pelatihan ketika performa optimal tercapai.
+- **Model Checkpointing:** Menyimpan model terbaik otomatis.
+- **Batch Training Multisaham:** Melatih banyak saham dalam satu kali eksekusi.
+
+Hasilnya: proses efisien dan stabil dengan nilai RMSE yang rendah.
+
+### 🏭 End-to-End Pipeline Otomatis
+
+Pipeline mencakup:
+- Pengambilan data historis otomatis (via Yahoo Finance)
+- Preprocessing & Scaler Management
+- Pelatihan LSTM untuk tiap saham
+- Penyimpanan artefak model (.keras) & scaler (.pkl)
+- Prediksi harian otomatis
+- Penanganan hari libur dan akhir pekan
+
+Cukup jalankan satu skrip — seluruh model akan diperbarui otomatis.
+
+### 📅 Smart Inference (Prediksi Hari Kerja)
+
+Sistem prediksi otomatis mendeteksi apakah prediksi berikutnya jatuh pada:
+- Sabtu
+- Minggu
+- Hari non-trading
+
+Jika ya, target prediksi digeser ke hari kerja terdekat — biasanya Senin.  
+Sehingga prediksi tidak kosong atau "bocor".
+
+---
+
+## 🛠 Teknologi yang Digunakan
+
+- **Python 3.8+** – Bahasa utama project
+- **TensorFlow / Keras** – Model LSTM multivariate
+- **YFinance** – Mengambil data pasar real-time
+- **NumPy & Pandas** – Manipulasi data dan perhitungan indikator teknikal
+- **Scikit-Learn** – Normalisasi (MinMaxScaler) dan alat preprocessing
+- **Matplotlib** – Visualisasi prediksi vs harga asli
+- **Pickle / Joblib** – Penyimpanan Scaler
+
+---
 
 ## 📂 Struktur Project
 
-```bash
-├── models/                 # Folder penyimpanan Model (.keras) & Scaler (.pkl)
-│   ├── model_BBRI.keras
-│   ├── scaler_X_BBRI.pkl
-│   └── ...
-├── notebooks/              # Jupyter Notebook untuk eksperimen / training
+Struktur ini dirancang untuk memisahkan model, eksperimen, pipeline utama, dan dokumentasi secara bersih.
+
+```
+├── models/                      # Penyimpanan artefak model & scaler
+│   ├── model_BBRI.keras         # Model LSTM saham BBRI
+│   ├── scaler_X_BBRI.pkl        # Scaler input untuk BBRI
+│   └── ...                      # Model dan scaler untuk saham lain
+│
+├── notebooks/                   # Notebook eksperimen
 │   └── Analisis_Saham_Final.ipynb
-├── src/                    # Source code utama
-│   └── analisis_saham.py  # Script untuk melatih semua saham dan prediksi harian
-│   
-├── requirements.txt        # Daftar library yang dibutuhkan
-└── README.md               # Dokumentasi project
+│       # EDA, feature engineering, dan eksperimen training
+│
+├── src/                         # Central pipeline & kode produksi
+│   └── analisis_saham.py        # Script training & prediksi otomatis multisaham
+│
+├── requirements.txt             # Daftar dependensi Python
+│
+└── README.md                    # Dokumentasi lengkap project
+```
